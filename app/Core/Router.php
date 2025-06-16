@@ -16,10 +16,15 @@ class Router {
             http_response_code(404);
             exit("Controller {$controllerName} não encontrado.");
         }
+
         require_once $file;
 
-        $fqcn = '\\App\\Controllers\\' . $controllerName;
-        $controller = new $fqcn();
+        if (!class_exists($controllerName)) {
+            http_response_code(500);
+            exit("Classe {$controllerName} não encontrada no arquivo.");
+        }
+
+        $controller = new $controllerName();
 
         if (!method_exists($controller, $method)) {
             http_response_code(404);
