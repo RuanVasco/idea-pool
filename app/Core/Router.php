@@ -1,14 +1,31 @@
 <?php
 
 class Router {
-    public function dispatch($uri) {
-        $uri = trim($uri, '/');
-        $segments = explode('/', $uri);
-        $controller = ucfirst($segments[0] ?? 'home') . 'Controller';
-        $method = $segments[1] ?? 'index';
+    public function dispatch(string $uri): void {
+        $segments = array_values(array_filter(
+            explode('/', trim($uri, '/'))
+        ));
 
-        require_once "../app/Controllers/{$controller}.php";
-        $obj = new $controller();
-        call_user_func_array([$obj, $method], array_slice($segments, 2));
+        $controllerName = ucfirst($segments[0] ?? 'home') . 'Controller';
+        $method         = $segments[1] ?? 'index';
+        $params         = array_slice($segments, 2);
+
+        $file = __DIR__ . '/../Controllers/' . $controllerName . '.php';
+
+        if (!file_exists($file)) {
+            http_response_code(404);
+            exit("Controller {$controllerName} não encontrado.");
+        }
+        require_once $file;
+
+        $fqcn = '\\App\\Controllers\\' . $controllerName;
+        $controller = new $fqcn();
+
+        if (!method_exists($controller, $method)) {
+            http_response_code(404);
+            exit("Método {$method} não encontrado.");
+        }
+
+        call_user_func_array([$controller, $method], $params);
     }
 }
