@@ -46,7 +46,7 @@
 				<select>
 					<option value="" disabled selected>Selecione um Status</option>
 					<?php foreach ($statuses as $status): ?>
-						<option value="<?= htmlspecialchars($status['id']) ?>"><?= htmlspecialchars($status['name']) ?></option>
+						<option value="<?= htmlspecialchars($status->getId()) ?>"><?= htmlspecialchars($status->getName()) ?></option>
 					<?php endforeach; ?>
 				</select>
 			</div>

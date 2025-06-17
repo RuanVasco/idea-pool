@@ -6,7 +6,7 @@ class Router {
 			explode('/', trim($uri, '/'))
 		));
 
-		$controllerName = ucfirst($segments[0] ?? 'home') . 'Controller';
+		$controllerName = ucfirst($segments[0] ?? 'ideas') . 'Controller';
 		$method         = $segments[1] ?? 'index';
 		$params         = array_slice($segments, 2);
 

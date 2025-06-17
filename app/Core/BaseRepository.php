@@ -26,27 +26,29 @@ abstract class BaseRepository {
 
 	abstract protected function getTable(): string;
 	abstract protected function getSchema(): string;
+	abstract protected function mapRow(array $row): BaseEntity;
 
 	public function findAll(): array {
-		$stmt = $this->db->query('SELECT * FROM ' . $this->getTable());
-		return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+		$rows = $this->db->query('SELECT * FROM ' . $this->getTable())
+			->fetchAll(PDO::FETCH_ASSOC);
+
+		return array_map([$this, 'mapRow'], $rows);
 	}
 
-	public function create(array $data): void {
-		$columns = implode(', ', array_keys($data));
-		$placeholders = ':' . implode(', :', array_keys($data));
-
-		$stmt = $this->db->prepare("INSERT INTO " . $this->getTable() . " ($columns) VALUES ($placeholders)");
-		foreach ($data as $key => $value) {
-			$stmt->bindValue(":$key", $value);
-		}
-		$stmt->execute();
-	}
-
-	public function findById(int $id): ?array {
+	public function findById(int $id): ?BaseEntity {
 		$stmt = $this->db->prepare('SELECT * FROM ' . $this->getTable() . ' WHERE id = :id');
-		$stmt->bindValue(':id', $id, \PDO::PARAM_INT);
-		$stmt->execute();
-		return $stmt->fetch(\PDO::FETCH_ASSOC) ?: null;
+		$stmt->execute(['id' => $id]);
+		$row = $stmt->fetch(PDO::FETCH_ASSOC);
+		return $row ? $this->mapRow($row) : null;
+	}
+
+	public function create(BaseEntity $entity): void {
+		$data = $entity->toArray();
+		unset($data['id']);
+
+		$cols = implode(', ', array_keys($data));
+		$marks = ':' . implode(', :', array_keys($data));
+		$stmt = $this->db->prepare("INSERT INTO {$this->getTable()} ($cols) VALUES ($marks)");
+		$stmt->execute($data);
 	}
 }

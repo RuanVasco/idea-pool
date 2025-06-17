@@ -13,4 +13,8 @@ class CategoryRepository extends BaseRepository {
         );
         SQL;
     }
+
+    protected function mapRow(array $row): Category {
+        return Category::fromArray($row);
+    }
 }

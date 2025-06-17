@@ -26,4 +26,8 @@ class UserRepository extends BaseRepository {
 		$stmt->execute();
 		return $stmt->fetchAll(PDO::FETCH_ASSOC);
 	}
+
+	protected function mapRow(array $row): User {
+		return User::fromArray($row);
+	}
 }

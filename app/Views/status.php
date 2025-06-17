@@ -9,13 +9,19 @@
 		<tr>
 			<th>ID</th>
 			<th>Status</th>
+			<th>Ações</th>
 		</tr>
 	</thead>
 	<tbody>
-		<?php foreach ($statuses as $status): ?>
+		<?php
+		foreach ($statuses as $status): ?>
 			<tr>
-				<td><?= htmlspecialchars($status['id']) ?></td>
-				<td><?= htmlspecialchars($status['name']) ?></td>
+				<td><?= htmlspecialchars($status->getId()) ?></td>
+				<td><?= htmlspecialchars($status->getName()) ?></td>
+				<td>
+					<button class="btn-edit" data-id="<?= $status->getId() ?>">✏️ Editar</button>
+					<button>Excluir</button>
+				</td>
 			</tr>
 		<?php endforeach; ?>
 	</tbody>
@@ -50,11 +56,7 @@
 					name: statusName
 				},
 				success: function(response) {
-					if (response.success) {
-						location.reload();
-					} else {
-						alert("Erro ao criar status: " + response.message);
-					}
+					location.reload();
 				},
 				error: function() {
 					alert("Erro ao comunicar com o servidor.");
@@ -63,5 +65,22 @@
 		} else {
 			alert("Por favor, insira um nome para o status.");
 		}
+	});
+
+	$("#buttonEdit").click(function(self) {
+		const statusId = $(this).data("id");
+
+		if (!statusId) return;
+
+		$.ajax({
+			url: `/statuses/${statusId}`,
+			type: "DELETE",
+			success: function(response) {
+				location.reload();
+			},
+			error: function() {
+				alert("Erro ao comunicar com o servidor.");
+			}
+		});
 	});
 </script>

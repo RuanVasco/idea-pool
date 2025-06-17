@@ -13,4 +13,8 @@ class StatusRepository extends BaseRepository {
         );
         SQL;
     }
+
+    protected function mapRow(array $row): Status {
+        return Status::fromArray($row);
+    }
 }

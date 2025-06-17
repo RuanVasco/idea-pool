@@ -36,14 +36,18 @@ class StatusesController {
 			}
 
 			$statusRepository = new StatusRepository();
-			$statusRepository->create(['name' => $name]);
+			$status = new Status(null, $name);
+			$statusRepository->create($status);
 
-			echo json_encode(['success' => true]);
+			echo json_encode(['message' => "Status criado com sucesso."]);
 			return;
 		}
 
 		http_response_code(405);
 		echo json_encode(['success' => false, 'message' => 'Método não permitido.']);
 		return;
+	}
+
+	private function delete($id): void {
 	}
 }

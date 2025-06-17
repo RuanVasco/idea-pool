@@ -22,4 +22,8 @@ class IdeaRepository extends BaseRepository {
         );
         SQL;
     }
+
+    protected function mapRow(array $row): Idea {
+        return Idea::fromArray($row);
+    }
 }
