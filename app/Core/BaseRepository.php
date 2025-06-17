@@ -51,4 +51,45 @@ abstract class BaseRepository {
 		$stmt = $this->db->prepare("INSERT INTO {$this->getTable()} ($cols) VALUES ($marks)");
 		$stmt->execute($data);
 	}
+
+	public function delete(BaseEntity $entity): void {
+		$data = $entity->toArray();
+		$id = $data['id'];
+
+		if ($id === null) {
+			throw new RuntimeException('Entidade sem ID — não é possível excluir.');
+		}
+
+		$sql  = "DELETE FROM {$this->getTable()} WHERE id = :id";
+		$stmt = $this->db->prepare($sql);
+		$stmt->bindValue(':id', $id, PDO::PARAM_INT);
+		$stmt->execute();
+	}
+
+	public function update(BaseEntity $oldEntity, BaseEntity $newEntity): void {
+		$data = $oldEntity->toArray();
+		$id = $data['id'];
+
+		if ($id === null) {
+			throw new RuntimeException('Entidade antiga sem ID — não é possível atualizar.');
+		}
+
+		$data = $newEntity->toArray();
+		unset($data['id']);
+
+		$set = implode(', ', array_map(
+			fn($col) => "$col = :$col",
+			array_keys($data)
+		));
+
+		$sql  = "UPDATE {$this->getTable()} SET $set WHERE id = :id";
+		$stmt = $this->db->prepare($sql);
+
+		foreach ($data as $col => $val) {
+			$stmt->bindValue(":$col", $val);
+		}
+		$stmt->bindValue(':id', $id, PDO::PARAM_INT);
+
+		$stmt->execute();
+	}
 }

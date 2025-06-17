@@ -48,6 +48,51 @@ class StatusesController {
 		return;
 	}
 
-	private function delete($id): void {
+	public function delete($id): void {
+		if (!($_SERVER['REQUEST_METHOD'] === 'DELETE')) {
+			http_response_code(405);
+			echo json_encode(['success' => false, 'message' => 'Método não permitido.']);
+			return;
+		}
+
+		if (empty($id)) {
+			echo json_encode(['success' => false, 'message' => 'Informar id do status.']);
+			return;
+		}
+
+		$statusRepository = new StatusRepository();
+		$status = $statusRepository->findById($id);
+		$statusRepository->delete($status);
+
+		echo json_encode(['message' => "Status deletado com sucesso."]);
+		return;
+	}
+
+	public function update(int $id): void {
+		if ($_SERVER['REQUEST_METHOD'] !== 'PUT') {
+			http_response_code(405);
+			echo json_encode(['success' => false, 'message' => 'Método não permitido.']);
+			return;
+		}
+
+		parse_str(file_get_contents('php://input'), $putData);
+
+		$name = trim($putData['name'] ?? '');
+		if ($name === '') {
+			echo json_encode(['success' => false, 'message' => 'Nome obrigatório.']);
+			return;
+		}
+
+		$repo = new StatusRepository();
+		$old  = $repo->findById($id);
+		if (!$old) {
+			http_response_code(404);
+			echo json_encode(['success' => false, 'message' => 'Status não encontrado.']);
+			return;
+		}
+
+		$repo->update($old, new Status($id, $name));
+
+		echo json_encode(['success' => true, 'message' => 'Status atualizado com sucesso.']);
 	}
 }

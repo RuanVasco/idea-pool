@@ -12,7 +12,7 @@ class IdeasController {
 		}
 
 		$ideas = (new IdeaRepository())->findAll();
-		$catehories = (new CategoryRepository())->findAll();
+		$categories = (new CategoryRepository())->findAll();
 		$statuses = (new StatusRepository())->findAll();
 		$viewFile = __DIR__ . '/../Views/idea.php';
 

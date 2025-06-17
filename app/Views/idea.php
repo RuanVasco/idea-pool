@@ -40,7 +40,7 @@
 				<select>
 					<option value="" disabled selected>Selecione uma Categoria</option>
 					<?php foreach ($categories as $category): ?>
-						<option value="<?= htmlspecialchars($category['id']) ?>"><?= htmlspecialchars($category['name']) ?></option>
+						<option value="<?= htmlspecialchars($category->getId()) ?>"><?= htmlspecialchars($category->getName()) ?></option>
 					<?php endforeach; ?>
 				</select>
 				<select>

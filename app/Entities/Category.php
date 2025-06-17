@@ -24,4 +24,8 @@ final class Category extends BaseEntity {
     public function getId(): int {
         return $this->id;
     }
+
+    public function getName(): string {
+        return $this->name;
+    }
 }
