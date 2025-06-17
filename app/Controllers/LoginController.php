@@ -1,9 +1,7 @@
 <?php
 
-class LoginController
-{
-	public function index()
-	{
+class LoginController {
+	public function index() {
 		if (session_status() === PHP_SESSION_NONE) {
 			session_start();
 		}
@@ -13,13 +11,14 @@ class LoginController
 			exit;
 		}
 
-		require __DIR__ . '/../Views/login.php';
+		$viewFile = __DIR__ . '/../Views/login.php';
+		require __DIR__ . '/../Views/layout.php';
 	}
 
-	public function login()
-	{
+	public function login() {
 		if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 			http_response_code(405);
+			header('Location: /');
 			exit('Método não permitido');
 		}
 
@@ -31,10 +30,10 @@ class LoginController
 		$password = $_POST['password'] ?? '';
 
 		$userRepo = new UserRepository();
-		$users = $userRepo->findAll();
+		$users = $userRepo->findByUsername($email);
 
 		foreach ($users as $user) {
-			if ($user['email'] === $email && $user['password'] === $password) {
+			if ($user['password'] === $password) {
 				$_SESSION['user_id'] = $user['id'];
 				header('Location: /');
 				exit;
@@ -42,10 +41,11 @@ class LoginController
 		}
 
 		echo 'Login inválido.';
+		header('Location: /login');
+		exit;
 	}
 
-	public function logout()
-	{
+	public function logout() {
 		if (session_status() === PHP_SESSION_NONE) {
 			session_start();
 		}
